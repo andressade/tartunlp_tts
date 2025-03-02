@@ -1,0 +1,36 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Tartu NLP Text-to-Speech seaded",
+        "description": "Seadista Tartu NLP kõnesüntees",
+        "data": {
+          "api_key": "API võti (kui on vajalik)",
+          "speaker": "Kõneleja",
+          "speed": "Kiirus (0.5-2.0)",
+          "url": "API URL",
+          "unique_id": "Unikaalne ID (valikuline)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Ühenduse loomine ebaõnnestus",
+      "invalid_auth": "Autentimine ebaõnnestus",
+      "unknown": "Ootamatu viga"
+    },
+    "abort": {
+      "already_configured": "Seade on juba konfigureeritud"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Tartu NLP Text-to-Speech valikud",
+        "description": "Muuda Tartu NLP kõnesünteesi seadeid",
+        "data": {
+          "speed": "Kiirus (0.5-2.0)"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Add Tartu NLP Text-to-Speech Engine",
+        "description": "Configure the Tartu NLP Text-to-Speech service for Estonian language synthesis.",
+        "data": {
+          "api_key": "API key (optional)",
+          "speed": "Speech speed (0.5-2.0)",
+          "speaker": "Select speaker voice",
+          "url": "API endpoint URL"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect to the service",
+      "invalid_auth": "Invalid authentication",
+      "already_configured": "This speaker voice and endpoint are already configured."
+    },
+    "abort": {
+      "already_configured": "This speaker voice and endpoint are already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Tartu NLP TTS Options",
+        "description": "Adjust your Tartu NLP TTS settings",
+        "data": {
+          "speed": "Speech speed (0.5-2.0)"
+        }
+      }
+    }
+  }
+}

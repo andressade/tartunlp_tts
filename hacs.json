@@ -1,0 +1,13 @@
+{
+    "name": "Tartu NLP Text-to-Speech",
+    "render_readme": true,
+    "homeassistant": "2023.10.0",
+    "hacs": "1.6.0",
+    "domains": ["tts"],
+    "iot_class": "cloud_polling",
+    "zip_release": false,
+    "filename": "",
+    "country": ["EE"],
+    "persistent_directory": false,
+    "hide_default_branch": false
+  }

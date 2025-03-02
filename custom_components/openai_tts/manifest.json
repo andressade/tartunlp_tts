@@ -1,0 +1,11 @@
+{
+  "domain": "tartunlp_tts",
+  "name": "Tartu NLP Text-to-Speech",
+  "documentation": "https://github.com/andressade/tartunlp_tts",
+  "dependencies": ["tts"],
+  "codeowners": ["@andressade"],
+  "requirements": [],
+  "config_flow": true,
+  "iot_class": "cloud_polling",
+  "version": "0.1.0"
+}
