@@ -60,22 +60,7 @@ class TartuNLPTTSEntity(TextToSpeechEntity):
         """Return the list of supported languages."""
         return self._engine.get_supported_langs()
 
-
-    @property
-    def supported_options(self)-> list[str]:
-        """Return list of supported options."""
-        return [
-            "speaker", 
-            "speed"
-        ]
-
-    @property
-    def default_options(self):
-        """Return a dict include default options."""
-        return {
-            "speaker": self._config.data[CONF_SPEAKER],
-            "speed": self._config.data[CONF_SPEED]
-        }       
+  
 
     @property
     def device_info(self):
