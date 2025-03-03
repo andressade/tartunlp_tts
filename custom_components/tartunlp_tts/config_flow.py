@@ -8,75 +8,67 @@ import homeassistant.helpers.config_validation as cv
 
 from .const import (
     CONF_API_KEY,
-    CONF_SPEAKER,
+    CONF_VOICE,
     CONF_SPEED,
     CONF_URL,
     DEFAULT_URL,
     DOMAIN,
-    SPEAKERS,
+    VOICES,
     UNIQUE_ID
 )
 
 _LOGGER = logging.getLogger(__name__)
+
+def generate_unique_id(user_input: dict) -> str:
+    """Generate a unique id from user input."""
+    url = urlparse(user_input[CONF_URL])
+    return f"{url.hostname}_{user_input[CONF_VOICE]}"
+
+async def validate_user_input(user_input: dict):
+    """Validate user input fields."""
+    if user_input.get(CONF_VOICE) is None:
+        raise ValueError("Voice is required")
 
 class TartuNLPConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for Tartu NLP TTS."""
 
     VERSION = 1
 
-    async def async_step_user(self, user_input=None):
+    data_schema = vol.Schema({
+        vol.Optional(CONF_API_KEY): str,
+        vol.Optional(CONF_URL, default="https://api.tartunlp.ai/text-to-speech/v2"): str,
+        vol.Optional(CONF_SPEED, default=1.0): vol.Coerce(float),
+        vol.Required(CONF_VOICE, default="mari"): selector({
+            "select": {
+                "options": VOICES,
+                "mode": "dropdown",
+                "sort": True,
+                "custom_value": True
+            }
+        })
+    })
+
+    async def async_step_user(self, user_input: dict[str, Any] | None = None):
         """Handle the initial step."""
         errors = {}
-
         if user_input is not None:
-            # Jätame valideerimise lihtsamaks
-            return self.async_create_entry(
-                title=f"Tartu NLP TTS - {user_input[CONF_SPEAKER]}",
-                data=user_input,
-            )
-
-        # Kiirus on float tüüpi, võimaldades 0.5-2.0 vahel väärtuseid
-        data_schema = vol.Schema(
-            {
-                vol.Optional(CONF_API_KEY): cv.string,
-                vol.Required(CONF_SPEAKER, default=SPEAKERS[0]): vol.In(SPEAKERS),
-                vol.Required(CONF_SPEED, default=1.0): vol.All(vol.Coerce(float), vol.Range(min=0.5, max=2.0)),
-                vol.Required(CONF_URL, default=DEFAULT_URL): cv.string,
-                vol.Optional(UNIQUE_ID): cv.string,
-            }
-        )
-
-        return self.async_show_form(
-            step_id="user", data_schema=data_schema, errors=errors
-        )
-
-    @staticmethod
-    @callback
-    def async_get_options_flow(config_entry):
-        """Get options flow for this handler."""
-        return TartuNLPOptionsFlow(config_entry)
-
-
-class TartuNLPOptionsFlow(config_entries.OptionsFlow):
-    """Handle options."""
-
-    def __init__(self, config_entry):
-        """Initialize options flow."""
-        self.config_entry = config_entry
-
-    async def async_step_init(self, user_input=None):
-        """Manage the options."""
-        if user_input is not None:
-            return self.async_create_entry(title="", data=user_input)
-
-        return self.async_show_form(
-            step_id="init",
-            data_schema=vol.Schema(
-                {
-                    vol.Required(
-                        CONF_SPEED,
-                        default=self.config_entry.data.get(CONF_SPEED, 1.0),
-                    ): vol.All(vol.Coerce(float), vol.Range(min=0.5, max=2.0)),
-                }
-            ),
-        )
+            try:
+                await validate_user_input(user_input)
+                unique_id = generate_unique_id(user_input)
+                user_input[UNIQUE_ID] = unique_id
+                await self.async_set_unique_id(unique_id)
+                self._abort_if_unique_id_configured()
+                hostname = urlparse(user_input[CONF_URL]).hostname
+                return self.async_create_entry(title=f"TartuNLP TTS ({hostname}, {user_input[CONF_VOICE]})", data=user_input)
+            except data_entry_flow.AbortFlow:
+                return self.async_abort(reason="already_configured")
+            except HomeAssistantError as e:
+                _LOGGER.exception(str(e))
+                errors["base"] = str(e)
+            except ValueError as e:
+                _LOGGER.exception(str(e))
+                errors["base"] = str(e)
+            except Exception as e:  # pylint: disable=broad-except
+                _LOGGER.exception(str(e))
+                errors["base"] = "unknown_error"
+        return self.async_show_form(step_id="user", data_schema=self.data_schema, errors=errors, description_placeholders=user_input)

@@ -22,6 +22,6 @@ class TartuNLPTTSEngine:
                 return await resp.read()
 
     @staticmethod
-    def get_supported_langs() -> list:
+    def get_supported_langs() -> list[str]:
         """Returns list of supported languages. Tartu NLP TTS toetab eesti keelt."""
         return ["et"]  # Eesti keel

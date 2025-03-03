@@ -7,7 +7,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.entity import generate_entity_id
-from .const import CONF_API_KEY, CONF_SPEAKER, CONF_SPEED, CONF_URL, DOMAIN, UNIQUE_ID
+from .const import CONF_API_KEY, VOICES,CONF_VOICE, CONF_SPEED, CONF_URL, DOMAIN, UNIQUE_ID
 from .tartunlp_engine import TartuNLPTTSEngine
 from homeassistant.exceptions import MaxLengthExceeded
 
@@ -26,7 +26,7 @@ async def async_setup_entry(
 
     engine = TartuNLPTTSEngine(
         api_key,
-        config_entry.data[CONF_SPEAKER],
+        config_entry.data[CONF_VOICE],
         config_entry.data[CONF_SPEED],
         config_entry.data[CONF_URL]
     )
@@ -47,8 +47,8 @@ class TartuNLPTTSEntity(TextToSpeechEntity):
         self._attr_unique_id = config.data.get(UNIQUE_ID)
         if self._attr_unique_id is None:
             # generate a legacy unique_id
-            self._attr_unique_id = f"{config.data[CONF_SPEAKER]}"
-        self.entity_id = generate_entity_id("tts.tartunlp_tts_{}", config.data[CONF_SPEAKER], hass=hass)
+            self._attr_unique_id = f"{config.data[CONF_VOICE]}"
+        self.entity_id = generate_entity_id("tts.tartunlp_tts_{}", config.data[CONF_VOICE], hass=hass)
 
     @property
     def default_language(self):
@@ -56,13 +56,13 @@ class TartuNLPTTSEntity(TextToSpeechEntity):
         return "et"  # Eesti keel
 
     @property
-    def supported_languages(self):
+    def supported_languages(self)-> list[str]:
         """Return the list of supported languages."""
         return self._engine.get_supported_langs()
 
 
     @property
-    def supported_options(self):
+    def supported_options(self)-> list[str]:
         """Return list of supported options."""
         return [
             "speaker", 
@@ -81,14 +81,14 @@ class TartuNLPTTSEntity(TextToSpeechEntity):
     def device_info(self):
         return {
             "identifiers": {(DOMAIN, self._attr_unique_id)},
-            "model": f"{self._config.data[CONF_SPEAKER]}",
+            "model": f"{self._config.data[CONF_VOICE]}",
             "manufacturer": "Tartu NLP"
         }
 
     @property
     def name(self):
         """Return name of entity"""
-        return f"{self._config.data[CONF_SPEAKER]}"
+        return f"{self._config.data[CONF_VOICE]}"
 
     async def async_get_tts_audio(self, message, language, options=None):
         """Convert a given text to speech and return it as bytes."""
