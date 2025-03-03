@@ -60,6 +60,23 @@ class TartuNLPTTSEntity(TextToSpeechEntity):
         """Return the list of supported languages."""
         return self._engine.get_supported_langs()
 
+
+    @property
+    def supported_options(self):
+        """Return list of supported options."""
+        return [
+            "speaker", 
+            "speed"
+        ]
+
+    @property
+    def default_options(self):
+        """Return a dict include default options."""
+        return {
+            "speaker": self._config.data[CONF_SPEAKER],
+            "speed": self._config.data[CONF_SPEED]
+        }       
+
     @property
     def device_info(self):
         return {
@@ -73,14 +90,14 @@ class TartuNLPTTSEntity(TextToSpeechEntity):
         """Return name of entity"""
         return f"{self._config.data[CONF_SPEAKER]}"
 
-    def get_tts_audio(self, message, language, options=None):
+    async def async_get_tts_audio(self, message, language, options=None):
         """Convert a given text to speech and return it as bytes."""
         try:
             # Tartu NLP API pole päris kindel max pikkuse piir, jätan kontrollimehhanismi
             if len(message) > 5000:
                 raise MaxLengthExceeded
 
-            speech = self._engine.get_tts(message)
+            speech = await self._engine.get_tts(message)
 
             # The response should contain the audio file content
             return "wav", speech.content

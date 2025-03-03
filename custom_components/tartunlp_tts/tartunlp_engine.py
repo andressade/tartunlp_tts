@@ -1,4 +1,4 @@
-import requests
+import aiohttp
 
 class TartuNLPTTSEngine:
 
@@ -8,7 +8,7 @@ class TartuNLPTTSEngine:
         self._speed = speed
         self._url = url
 
-    def get_tts(self, text: str):
+    async def get_tts(self, text: str):
         """ Makes request to Tartu NLP TTS engine to convert text into audio"""
         # API võti pole vajalik Tartu NLP puhul, kuid jätan alles juhuks kui tulevikus on
         headers: dict = {"Authorization": f"Bearer {self._api_key}"} if self._api_key else {}
@@ -17,7 +17,9 @@ class TartuNLPTTSEngine:
             "speaker": self._speaker,
             "speed": self._speed
         }
-        return requests.post(self._url, headers=headers, json=data)
+        async with aiohttp.ClientSession() as session:
+            async with session.post(self._url, headers=headers, json=data) as resp:
+                return await resp.read()
 
     @staticmethod
     def get_supported_langs() -> list:
